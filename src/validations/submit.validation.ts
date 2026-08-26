@@ -52,7 +52,7 @@ const validateCommonSubmissionFields = (listing: Record<string, any>, errors: st
     // Commercial Details - COMMON
     if (isMissing(commercial?.property_purpose)) errors.push("commercial_details.property_purpose");
     if (isMissing(commercial?.availability_status)) errors.push("commercial_details.availability_status");
-    if (isMissing(commercial?.available_from)) errors.push("commercial_details.available_from");
+    // if (isMissing(commercial?.available_from)) errors.push("commercial_details.available_from");
     if (isMissing(commercial?.current_occupation_status)) errors.push("commercial_details.current_occupation_status");
     if (isMissing(commercial?.visit_day)) errors.push("commercial_details.visit_day");
     if (isMissing(commercial?.start_time)) errors.push("commercial_details.start_time");
@@ -157,6 +157,7 @@ const validateUnitTypeFields = (listing: Record<string, any>, errors: string[]) 
                 if (isMissing(commercial?.cam_charges)) errors.push("commercial_details.cam_charges");
                 if (isMissing(commercial?.building_plan_approval)) errors.push("commercial_details.building_plan_approval");
                 if (isMissing(commercial?.fire_noc)) errors.push("commercial_details.fire_noc");
+                if (isMissing(details?.no_of_conference_rooms)) errors.push("listing_details.no_of_conference_rooms");
                 break;
             }
 
@@ -188,7 +189,7 @@ const validateUnitTypeFields = (listing: Record<string, any>, errors: string[]) 
         switch (details.unit_type) {
             case Constants.RetailUnitType.SHOP:
             case Constants.RetailUnitType.SHOWROOM: {
-                // Add retail-specific mandatory fields here.
+                // Add retail-specific mandatory fields.
                 break;
             }
             default: {
@@ -202,8 +203,7 @@ const validateUnitTypeFields = (listing: Record<string, any>, errors: string[]) 
         switch (details.unit_type) {
             case Constants.LandUnitType.RESIDENTIAL_PLOT:
             case Constants.LandUnitType.COMMERCIAL_LAND: {
-                // Add land-specific mandatory fields here.
-                //same update 
+                // Add land-specific mandatory fields.
                 break;
             }
             default: {
@@ -213,7 +213,6 @@ const validateUnitTypeFields = (listing: Record<string, any>, errors: string[]) 
         }
         return;
     }   
-
     // Unsupported listing type
     errors.push(`Unsupported listing_type: ${listing.listing_type}`);
 };

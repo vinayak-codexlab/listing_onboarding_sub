@@ -16,7 +16,7 @@ const ListingDetailsSchema = new Schema(
     listing_location: String,
     project: String,
     tower: String,
-    unit_no: String,
+    unit_no: String, // can be objectId or string value
     floor_no: String,
     combine_unit_no: [String],
     UnitFloorPosition: { type: String, enum: Object.values(UnitFloorPosition) },
@@ -89,6 +89,9 @@ const ListingDetailsSchema = new Schema(
 
     servant_quarters: { type: String, enum: Object.values(YesAndNo) },
     lawn_area: String,
+
+    no_of_lifts: String,
+    
 
   },
   noIdOption
