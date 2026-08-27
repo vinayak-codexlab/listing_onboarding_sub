@@ -3,7 +3,8 @@ import {
   ListingType, ListingStatus, HomeUnitType, UnitFloorPosition, ProjectType,
   PlotAreaUnitType, PropertyStatus, PossessionTimeline, PropertyPurpose, Direction,
   AreaUnitType, PetsAllowed, VisitDay, Day, BrokerageTerms, NoticeNeededDuration,
-  CurrentOccupancy, AreaType, VastuCompliant, CrossVentilation, NaturalLight, OnboardingStep, YesAndNo
+  CurrentOccupancy, AreaType, VastuCompliant, CrossVentilation, NaturalLight, OnboardingStep, YesAndNo, 
+  LandOwnershipType, PlotShape, LandTapography, NoOfOpenSides, AccessRoad,RoadType,RoadFacingSide,SourceOfWater,SewageDrainage,ExistingStructure
 } from "../constants/index.constant.js";
 
 const noIdOption = { _id: false };
@@ -58,7 +59,7 @@ const ListingDetailsSchema = new Schema(
     ceiling_height_side: String,
     vastu_compliant: { type: String, enum: Object.values(VastuCompliant) },
     pets_allowed: { type: String, enum: Object.values(PetsAllowed) },
-    source_of_water: String,
+    source_of_water: {type:String, enum: Object.values(SourceOfWater)},
 
     //------------- Office Specific -------------------
     no_of_seats: String,
@@ -106,20 +107,20 @@ const ListingDetailsSchema = new Schema(
     plot_length_unit_type: String,
     plot_width: String,
     plot_width_unit_type: String,
-    land_ownership_type: String,
-    plot_shape: String,
-    access_road: String,
+    land_ownership_type: {type : String, enum:Object.values(LandOwnershipType)},
+    plot_shape: {type:String, enum:Object.values(PlotShape)},
+    access_road: {type:String, enum:Object.values(AccessRoad)},
     access_road_width_unit_type: String,
-    road_type: String,
+    road_type: {type:String, enum: Object.values(RoadType)},
     electricity_connection: Boolean,
-    land_tapography: String,
-    road_facing_side: String,
+    land_tapography: { type: String, enum: Object.values(LandTapography) },
+    road_facing_side: {type: String, enum: Object.values(RoadFacingSide)},
     corner_plot: { type: String, enum: Object.values(YesAndNo) },
-    no_of_open_sides: String,
+    no_of_open_sides: {type:String, enum: Object.values(NoOfOpenSides)},
     boundary_wall: Boolean,
-    sewage_drainage: String,
+    sewage_drainage: {type: String, enum:Object.values(SewageDrainage)},
     gated_community: { type: String, enum: Object.values(YesAndNo) },
-    existing_structure: String,
+    existing_structure: {type:String, enum:Object.values(ExistingStructure)},
     constructed_area: String,
     constructed_area_unit_type: String,
 

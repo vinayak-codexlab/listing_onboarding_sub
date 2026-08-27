@@ -75,7 +75,7 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.ceiling_height_side": optionalString,
   "listing_details.vastu_compliant": z.nativeEnum(Constants.VastuCompliant).optional(),
   "listing_details.pets_allowed": z.nativeEnum(Constants.PetsAllowed).optional(),
-  "listing_details.source_of_water": optionalString,
+  "listing_details.source_of_water": z.nativeEnum(Constants.SourceOfWater).optional(),
 
   // Listing Details - Office Specific
   "listing_details.no_of_seats": optionalString,
@@ -122,20 +122,20 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.plot_length_unit_type": optionalString,
   "listing_details.plot_width": optionalString,
   "listing_details.plot_width_unit_type": optionalString,
-  "listing_details.land_ownership_type": optionalString,
-  "listing_details.plot_shape": optionalString,
-  "listing_details.access_road": optionalString,
+  "listing_details.land_ownership_type": z.nativeEnum(Constants.LandOwnershipType).optional(),
+  "listing_details.plot_shape": z.nativeEnum(Constants.PlotShape).optional(),
+  "listing_details.access_road": z.nativeEnum(Constants.AccessRoad).optional(),
   "listing_details.access_road_width_unit_type": optionalString,
-  "listing_details.road_type": optionalString,
+  "listing_details.road_type": z.nativeEnum(Constants.RoadType).optional(),
   "listing_details.electricity_connection": optionalBoolean,
-  "listing_details.land_tapography": optionalString,
-  "listing_details.road_facing_side": optionalString,
+  "listing_details.land_tapography": z.nativeEnum(Constants.LandTapography).optional(),
+  "listing_details.road_facing_side": z.nativeEnum(Constants.RoadFacingSide).optional(),
   "listing_details.corner_plot": z.nativeEnum(Constants.YesAndNo).optional(),
-  "listing_details.no_of_open_sides": optionalString,
+  "listing_details.no_of_open_sides": z.nativeEnum(Constants.NoOfOpenSides).optional(),
   "listing_details.boundary_wall": optionalBoolean,
-  "listing_details.sewage_drainage": optionalString,
+  "listing_details.sewage_drainage": z.nativeEnum(Constants.SewageDrainage).optional(),
   "listing_details.gated_community": z.nativeEnum(Constants.YesAndNo).optional(),
-  "listing_details.existing_structure": optionalString,
+  "listing_details.existing_structure": z.nativeEnum(Constants.ExistingStructure).optional(),
   "listing_details.constructed_area": optionalString,
   "listing_details.constructed_area_unit_type": optionalString,
 
@@ -229,7 +229,12 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
 export const validateListingData = (data: Record<string, any>) => {
   for (const [key, value] of Object.entries(data)) {
     // Server-controlled protected fields
-    if (key === "sub" || key === "firm_id" || key === "listing_id") {
+    if (
+      key === "broker_and_agent.sub" || 
+      key === "broker_and_agent.firm_id" || 
+      key === "listing_id" || 
+      key === "listing_details.listing_status"
+    ) {
       throw new ApiError(400, `Field cannot be provided: ${key}`);
     }
     if (value !== null && typeof value === "object" && !Array.isArray(value)) {

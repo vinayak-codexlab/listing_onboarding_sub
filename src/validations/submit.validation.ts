@@ -27,7 +27,7 @@ const validateCommonSubmissionFields = (listing: Record<string, any>, errors: st
     if (isMissing(commercial?.property_purpose)) errors.push("commercial_details.property_purpose");
 
     // Financials: Check price based on purpose (Sale vs Rent)
-    if (commercial?.property_purpose === "RENT_LEASE") {
+    if (commercial?.property_purpose === "rent/lease") {
         if (isMissing(commercial?.monthly_rent)) errors.push("commercial_details.monthly_rent");
         if (isMissing(commercial?.security_amount)) errors.push("commercial_details.security_amount");
     } else {
@@ -125,7 +125,7 @@ const validateUnitTypeFields = (listing: Record<string, any>, errors: string[]) 
         if (isMissing(details?.tower)) errors.push("listing_details.tower");
         if (isMissing(details?.floor_no)) errors.push("listing_details.floor_no");
         if (isMissing(details?.UnitFloorPosition)) errors.push("listing_details.UnitFloorPosition");
-        if (isMissing(details?.locationHub)) errors.push("listing_details.locationHub");
+        // if (isMissing(details?.locationHub)) errors.push("listing_details.locationHub");
         if (isMissing(details?.unit_no)) errors.push("listing_details.unit_no");
         if (isMissing(details?.unit_type)) errors.push("listing_details.unit_type");
         if (isMissing(details?.area_unit_type)) errors.push("listing_details.area_unit_type");
@@ -145,9 +145,7 @@ const validateUnitTypeFields = (listing: Record<string, any>, errors: string[]) 
 
     // INDUSTRIAL
     if (listing.listing_type === Constants.ListingType.INDUSTRIAL) {
-        if (isMissing(details?.building_name)) errors.push("listing_details.building_name");
         if (isMissing(details?.unit_on_floor)) errors.push("listing_details.unit_on_floor");
-        if (isMissing(details?.plot_survey_no)) errors.push("listing_details.plot_survey_no");
         if (isMissing(details?.area_unit_type)) errors.push("listing_details.area_unit_type");
 
         // // Conditional location checks based on region type
@@ -183,7 +181,7 @@ const validateUnitTypeFields = (listing: Record<string, any>, errors: string[]) 
     errors.push(`Unsupported listing_type: ${listing.listing_type}`);
 };
 
-//main submission validation
+//main submission validation for action
 export const validateListingSubmission = (listing: Record<string, any>): string[] => {
     const errors: string[] = [];
     validateCommonSubmissionFields(listing, errors);

@@ -86,4 +86,87 @@ export enum AreaType{
   TOTAL_SELLABLE = "total_sellable"
 }
 
-//office data
+//land type enums data
+export enum LandOwnershipType{
+  FREEHOLD = "freehold",
+  LEASEHOLD = "leasehold",
+  POWER_OF_ATTORNEY = "power_of_attorney",
+  PAGDI = "pagdi",
+  OTHER = "other",
+}
+
+export enum PlotShape{
+  REGULAR = "regular",
+  IRREGULAR = "irregular",
+  L_SHAPED = "l_shaped",
+  TRIANGULAR = "triangular",
+  OTHER = "other",
+}
+
+export enum LandTapography{
+  FLAT = "flat",
+  SLOPED = "sloped",
+  UNDULATING = "undulating",
+  HILLY = "hilly",
+}
+
+export enum NoOfOpenSides{
+  ONE = "1",
+  TWO = "2",
+  THREE = "3",
+  FOUR = "4",
+}
+
+export enum AccessRoad{
+  SINGLE_ROAD = "single_road",
+  DOUBLE_ROAD = "double_road",
+  TRIPLE_ROAD = "triple_road",
+  NO_DIRECT_ROAD_ACCESS = "no_direct_road_access",
+}
+
+export enum RoadType{
+  TAR = "tar",
+  CONCRETE = "concrete",
+  GRAVEL = "gravel",
+  KACHCHA = "kachcha",
+  NH = "nh",
+  SH = "sh"
+}
+
+export enum RoadFacingSide{
+  NORTH = "north",
+  SOUTH = "south",
+  EAST = "east",
+  WEST = "west",
+  NORTH_EAST = "north_east",
+  NORTH_WEST = "north_west",
+  SOUTH_EAST = "south_east",
+  SOUTH_WEST = "south_west",
+}
+
+export enum SourceOfWater{
+  MUNICIPAL = "municipal",
+  BOREWELL = "borewell",
+  WELL = "well",
+  CANAL = "canal",
+  NONE = "none",
+}
+
+export enum SewageDrainage{
+  MUNCIPAL = "municipal",
+  SEPTIC="septic",
+  OPEN="open",
+  NONE="none",
+}
+
+export enum ExistingStructure{
+  Vacant = "vacant",
+  DEMOLISHED_STRUCTURE = "demolished_structure",
+  OLD_STUCTURE_STANDING = "old_structure_standing",
+}
+
+export enum ElectricityConnection{
+  YES = "yes",
+  NO = "no",
+  NEARBY_AVAILABLE = "nearby_available",
+}
