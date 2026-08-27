@@ -13,22 +13,25 @@ const optionalDate = z.coerce.date().optional();
 
 // Flat Listing Field Validation
 const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
-  _id:objectIdSchema.optional(),
+  _id: objectIdSchema.optional(),
 
-  // Listing
-  "listing_type": z.nativeEnum(Constants.ListingType),
-  "current_step": z.nativeEnum(Constants.OnboardingStep),
-  "listing_id": z.string().trim().length(10, "Listing ID must be exactly 10 characters"),
-  "onboarding_type": z.string().trim(),
-  "lastUpdate": z.coerce.date(),
-  "firm_name": optionalString,
-  "broker_name": optionalString,
-  "is_personalized": optionalBoolean,
+  // Listing Root Level
+  listing_type: z.nativeEnum(Constants.ListingType),
+  current_step: z.nativeEnum(Constants.OnboardingStep),
+  listing_id: z.string().trim().length(10, "Listing ID must be exactly 10 characters"),
+  onboarding_type: z.string().trim(),
+  lastUpdate: z.coerce.date(),
+  firm_name: optionalString,
+  broker_name: optionalString,
+  is_personalized: optionalBoolean,
+  vrTour: optionalString,
+  coverImageKey: optionalString,
 
-  // Listing Details
+  // Listing Details - Common Fields
   "listing_details.listing_status": z.nativeEnum(Constants.ListingStatus).optional(),
   "listing_details.listing_location": optionalString,
   "listing_details.project": optionalString,
+  "listing_details.project_name": optionalString,
   "listing_details.tower": optionalString,
   "listing_details.unit_no": optionalString,
   "listing_details.floor_no": optionalString,
@@ -40,7 +43,7 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.floorHide": optionalBoolean,
   "listing_details.isCustomUnit": optionalBoolean,
   "listing_details.share": optionalBoolean,
-  "listing_details.area": z.coerce.number().positive("Area must be greater than 0").optional(),
+  "listing_details.area": z.union([z.coerce.number().positive(), z.string().trim()]).optional(),
   "listing_details.area_type": z.nativeEnum(Constants.AreaType).optional(),
   "listing_details.listing_name": optionalString,
   "listing_details.entry_direction": z.nativeEnum(Constants.Direction).optional(),
@@ -58,12 +61,12 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.total_floor": optionalString,
   "listing_details.flooring": optionalString,
   "listing_details.flooring_type": optionalString,
-  "listing_details.bhk": optionalString,
-  "listing_details.bhk_type": optionalString,
   "listing_details.no_of_balconies": optionalString,
   "listing_details.no_of_bathrooms": optionalString,
+  "listing_details.no_of_lifts": optionalString,
   "listing_details.no_of_passengers_lifts": optionalString,
   "listing_details.no_of_parkings": optionalString,
+  "listing_details.no_of_private_parkings": optionalString,
   "listing_details.cross_ventilation": z.nativeEnum(Constants.CrossVentilation).optional(),
   "listing_details.natural_light": z.nativeEnum(Constants.NaturalLight).optional(),
   "listing_details.furnishing": optionalString,
@@ -72,21 +75,24 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.ceiling_height_side": optionalString,
   "listing_details.vastu_compliant": z.nativeEnum(Constants.VastuCompliant).optional(),
   "listing_details.pets_allowed": z.nativeEnum(Constants.PetsAllowed).optional(),
+  "listing_details.source_of_water": optionalString,
 
-  // Listing Details - Office Page & Additional Fields
+  // Listing Details - Office Specific
   "listing_details.no_of_seats": optionalString,
   "listing_details.no_of_cabins": optionalString,
   "listing_details.no_of_meeting_rooms": optionalString,
-  "listing_details.reception_area": z.nativeEnum(Constants.YesAndNo).optional(),
-  "listing_details.pantry": z.nativeEnum(Constants.YesAndNo).optional(),
+  "listing_details.no_of_conference_rooms": optionalString,
   "listing_details.no_of_private_washroom": optionalString,
   "listing_details.no_of_common_washroom": optionalString,
-  "listing_details.no_of_private_parkings": optionalString,
-  "listing_details.no_of_conference_rooms": optionalString,
+  "listing_details.reception_area": z.nativeEnum(Constants.YesAndNo).optional(),
+  "listing_details.pantry": z.nativeEnum(Constants.YesAndNo).optional(),
   "listing_details.lobby": z.nativeEnum(Constants.YesAndNo).optional(),
   "listing_details.refuge": z.nativeEnum(Constants.YesAndNo).optional(),
   "listing_details.food_court_cafeteria": z.nativeEnum(Constants.YesAndNo).optional(),
 
+  // Listing Details - Home Specific
+  "listing_details.bhk": z.union([objectIdSchema, z.string().trim(), z.number()]).optional(),
+  "listing_details.bhk_type": optionalString,
   "listing_details.building_status": optionalString,
   "listing_details.building_age": nonNegativeNumber,
   "listing_details.structure": optionalString,
@@ -99,12 +105,56 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.servant_quarters": z.nativeEnum(Constants.YesAndNo).optional(),
   "listing_details.lawn_area": optionalString,
 
-  // Commercial Details
+  // Listing Details - Industrial Specific
+  "listing_details.location_type": optionalString,
+  "listing_details.ceiling_height_inch": optionalString,
+  "listing_details.ceiling_height_side_inch": optionalString,
+  "listing_details.power_in_KA": optionalString,
+  "listing_details.office_area": z.nativeEnum(Constants.YesAndNo).optional(),
+  "listing_details.truck_access": z.nativeEnum(Constants.YesAndNo).optional(),
+  "listing_details.access_road_width": optionalString,
+  "listing_details.vehicle_height_restrictions": optionalString,
+  "listing_details.loading_area": z.nativeEnum(Constants.YesAndNo).optional(),
+  "listing_details.lorry_bay_area": z.nativeEnum(Constants.YesAndNo).optional(),
+
+  // Listing Details - Land Specific
+  "listing_details.plot_length": optionalString,
+  "listing_details.plot_length_unit_type": optionalString,
+  "listing_details.plot_width": optionalString,
+  "listing_details.plot_width_unit_type": optionalString,
+  "listing_details.land_ownership_type": optionalString,
+  "listing_details.plot_shape": optionalString,
+  "listing_details.access_road": optionalString,
+  "listing_details.access_road_width_unit_type": optionalString,
+  "listing_details.road_type": optionalString,
+  "listing_details.electricity_connection": optionalBoolean,
+  "listing_details.land_tapography": optionalString,
+  "listing_details.road_facing_side": optionalString,
+  "listing_details.corner_plot": z.nativeEnum(Constants.YesAndNo).optional(),
+  "listing_details.no_of_open_sides": optionalString,
+  "listing_details.boundary_wall": optionalBoolean,
+  "listing_details.sewage_drainage": optionalString,
+  "listing_details.gated_community": z.nativeEnum(Constants.YesAndNo).optional(),
+  "listing_details.existing_structure": optionalString,
+  "listing_details.constructed_area": optionalString,
+  "listing_details.constructed_area_unit_type": optionalString,
+
+  // Listing Details - Retail Specific
+  "listing_details.fit_out_condition": optionalString,
+  "listing_details.frontage": nonNegativeNumber,
+  "listing_details.frontageType": optionalString,
+  "listing_details.visibility_from": optionalString,
+  "listing_details.signage_rights": optionalBoolean,
+  "listing_details.display_area": optionalBoolean,
+  "listing_details.mezzanine": optionalBoolean,
+
+  // Commercial Details - Common Fields
   "commercial_details.parking_type": optionalString,
   "commercial_details.property_purpose": z.nativeEnum(Constants.PropertyPurpose).optional(),
   "commercial_details.availability_status": optionalString,
+  "commercial_details.availablility_status": optionalString, // Handles payload typo variant
   "commercial_details.priceHide": optionalBoolean,
-  "commercial_details.available_from": z.coerce.date().optional().nullable(),
+  "commercial_details.available_from": z.union([z.coerce.date(), z.string().trim()]).optional().nullable(),
   "commercial_details.current_occupation_status": z.nativeEnum(Constants.CurrentOccupancy).optional(),
   "commercial_details.visit_day": z.nativeEnum(Constants.VisitDay).optional(),
   "commercial_details.particular_day": z.nativeEnum(Constants.Day).optional().nullable(),
@@ -124,27 +174,39 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "commercial_details.maintenance_included": optionalString,
   "commercial_details.notice_needed": z.nativeEnum(Constants.NoticeNeededDuration).optional(),
   "commercial_details.internal_notes": optionalString,
-
-  // Commercial Details - Office Page Fields
-  "commercial_details.monthly_rent": nonNegativeNumber,
+  "commercial_details.move_in_charges": nonNegativeNumber,
   "commercial_details.cam_charges": nonNegativeNumber,
   "commercial_details.building_plan_approval": z.nativeEnum(Constants.YesAndNo).optional(),
   "commercial_details.fire_noc": z.nativeEnum(Constants.YesAndNo).optional(),
-  "commercial_details.move_in_charges": nonNegativeNumber,
+
+  // Commercial Details - Office Specific
+  "commercial_details.monthly_rent": nonNegativeNumber,
   "commercial_details.sale_consideration": nonNegativeNumber,
 
+  // Commercial Details - Land Specific
+  "commercial_details.visit_allowed": optionalBoolean,
+  "commercial_details.access_notes": optionalString,
+  "commercial_details.tax_govt_charges_included": z.nativeEnum(Constants.YesAndNo).optional(),
+
+  // Commercial Details - Retail Specific
+  "commercial_details.suitable_for": optionalString,
+  "commercial_details.oc": z.nativeEnum(Constants.YesAndNo).optional(),
+  "commercial_details.cam_charges_included": z.nativeEnum(Constants.YesAndNo).optional(),
+  "commercial_details.keys_occupation": optionalString,
 
   // Broker & Agent
   "broker_and_agent.sub": z.string().trim().min(1),
   "broker_and_agent.firm_id": objectIdSchema,
 
   // Key Features
-  "key_features": z.array(z.string().trim().min(1, "Key feature cannot be empty")),
+  key_features: z.array(z.string().trim().min(1, "Key feature cannot be empty")),
 
   // Property Details
   "property_details.unit_no": optionalString,
   "property_details.project_name": optionalString,
   "property_details.tower": optionalString,
+  "property_details.tower_name": optionalString,
+  "property_details.floor_no": optionalString,
 
   // Listing Address
   "listing_address.line_1": optionalString,
@@ -153,22 +215,28 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_address.locality": optionalString,
   "listing_address.city": optionalString,
   "listing_address.pincode": optionalNumber,
+  "listing_address.district": optionalString,
+  "listing_address.taluka": optionalString,
+  "listing_address.village": optionalString,
+  "listing_address.google_map_link": optionalString,
+  "listing_address.google_map_link_hide": optionalBoolean,
 
   // Amenities
-  "furnishingAmenities": z.array(z.any()),
-  "apartmentAmenities": z.array(z.string())
+  furnishingAmenities: z.array(z.any()),
+  apartmentAmenities: z.array(z.string())
 };
 
 export const validateListingData = (data: Record<string, any>) => {
   for (const [key, value] of Object.entries(data)) {
-    // Server controlled fields
+    // Server-controlled protected fields
     if (key === "sub" || key === "firm_id" || key === "listing_id") {
       throw new ApiError(400, `Field cannot be provided: ${key}`);
     }
     if (value !== null && typeof value === "object" && !Array.isArray(value)) {
       throw new ApiError(400, `Provide '${key}' data in dot notation form`);
     }
-    // Normal listing field
+
+    // Validate field using dot-notation schemas
     const schema = listingFieldSchemas[key];
     if (!schema) {
       throw new ApiError(400, `Invalid field: ${key}`);
@@ -184,8 +252,9 @@ export const validateListingData = (data: Record<string, any>) => {
   }
   return data;
 };
-// Status Action
+
+// Status Action Validator
 export const listingActionSchema = z.object({
   params: z.object({ id: objectIdSchema }),
   body: z.object({ action: z.nativeEnum(Constants.ListingStatus) })
-})
+});

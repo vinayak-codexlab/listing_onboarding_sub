@@ -97,7 +97,7 @@ const ListingDetailsSchema = new Schema(
     truck_access: { type: String, enum: Object.values(YesAndNo) },
     access_road_width: String,
     vehicle_height_restrictions: String,
-    vehicle_height_inch: String,
+    // vehicle_height_inch: String,
     loading_area: { type: String, enum: Object.values(YesAndNo) },
     lorry_bay_area: { type: String, enum: Object.values(YesAndNo) },
 
