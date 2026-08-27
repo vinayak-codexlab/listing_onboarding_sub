@@ -16,7 +16,7 @@ const ListingDetailsSchema = new Schema(
     listing_location: String,
     project: String,
     tower: String,
-    unit_no: String, // can be objectId or string value
+    unit_no: String,
     floor_no: String,
     combine_unit_no: [String],
     UnitFloorPosition: { type: String, enum: Object.values(UnitFloorPosition) },
@@ -26,7 +26,7 @@ const ListingDetailsSchema = new Schema(
     floorHide: { type: Boolean, default: false },
     isCustomUnit: { type: Boolean, default: false },
     share: { type: Boolean, default: true },
-    area: Number,
+    area: Schema.Types.Mixed,
     area_type: { type: String, enum: Object.values(AreaType) },
     listing_name: String,
     entry_direction: { type: String, enum: Object.values(Direction) },
@@ -44,12 +44,12 @@ const ListingDetailsSchema = new Schema(
     total_floor: String,
     flooring: String,
     flooring_type: String,
-    bhk: String,
-    bhk_type: String,
     no_of_balconies: String,
     no_of_bathrooms: String,
+    no_of_lifts: String,
     no_of_passengers_lifts: String,
     no_of_parkings: String,
+    no_of_private_parkings: String,
     cross_ventilation: { type: String, enum: Object.values(CrossVentilation) },
     natural_light: { type: String, enum: Object.values(NaturalLight) },
     furnishing: String,
@@ -58,41 +58,79 @@ const ListingDetailsSchema = new Schema(
     ceiling_height_side: String,
     vastu_compliant: { type: String, enum: Object.values(VastuCompliant) },
     pets_allowed: { type: String, enum: Object.values(PetsAllowed) },
+    source_of_water: String,
 
-    //-------------office page fields -------------------
+    //------------- Office Specific -------------------
     no_of_seats: String,
     no_of_cabins: String,
     no_of_meeting_rooms: String,
-    reception_area: {type:String, enum: Object.values(YesAndNo)},
-    pantry: {type:String, enum: Object.values(YesAndNo)},
+    no_of_conference_rooms: String,
     no_of_private_washroom: String,
     no_of_common_washroom: String,
-    no_of_private_parkings: String,
-
-    no_of_conference_rooms: String,
+    reception_area: { type: String, enum: Object.values(YesAndNo) },
+    pantry: { type: String, enum: Object.values(YesAndNo) },
     lobby: { type: String, enum: Object.values(YesAndNo) },
     refuge: { type: String, enum: Object.values(YesAndNo) },
     food_court_cafeteria: { type: String, enum: Object.values(YesAndNo) },
 
-    //-------------other additional fields --------------
+    //------------- Home Specific -------------------
+    bhk: Schema.Types.Mixed,
+    bhk_type: String,
     building_status: String,
     building_age: Number,
     structure: String,
-
     boundary_wall_type: String,
     boundary_wall_height: String,
     boundary_wall_height_side: String,
-
     gate_type: String,
     gate_height: String,
     gate_height_side: String,
-
     servant_quarters: { type: String, enum: Object.values(YesAndNo) },
     lawn_area: String,
 
-    no_of_lifts: String,
-    
+    //------------- Industrial Specific -------------------
+    location_type: String,
+    ceiling_height_inch: String,
+    ceiling_height_side_inch: String,
+    power_in_KA: String,
+    office_area: { type: String, enum: Object.values(YesAndNo) },
+    truck_access: { type: String, enum: Object.values(YesAndNo) },
+    access_road_width: String,
+    vehicle_height_restrictions: String,
+    vehicle_height_inch: String,
+    loading_area: { type: String, enum: Object.values(YesAndNo) },
+    lorry_bay_area: { type: String, enum: Object.values(YesAndNo) },
 
+    //------------- Land Specific -------------------
+    plot_length: String,
+    plot_length_unit_type: String,
+    plot_width: String,
+    plot_width_unit_type: String,
+    land_ownership_type: String,
+    plot_shape: String,
+    access_road: String,
+    access_road_width_unit_type: String,
+    road_type: String,
+    electricity_connection: Boolean,
+    land_tapography: String,
+    road_facing_side: String,
+    corner_plot: { type: String, enum: Object.values(YesAndNo) },
+    no_of_open_sides: String,
+    boundary_wall: Boolean,
+    sewage_drainage: String,
+    gated_community: { type: String, enum: Object.values(YesAndNo) },
+    existing_structure: String,
+    constructed_area: String,
+    constructed_area_unit_type: String,
+
+    //------------- Retail Specific -------------------
+    fit_out_condition: String,
+    frontage: Number,
+    frontageType: String,
+    visibility_from: String,
+    signage_rights: Boolean,
+    display_area: Boolean,
+    mezzanine: Boolean
   },
   noIdOption
 );
@@ -104,7 +142,7 @@ const CommercialDetailsSchema = new Schema(
     property_purpose: { type: String, enum: Object.values(PropertyPurpose) },
     availability_status: String,
     priceHide: { type: Boolean, default: false },
-    available_from: Date,
+    available_from: Schema.Types.Mixed,
     current_occupation_status: { type: String, enum: Object.values(CurrentOccupancy) },
     visit_day: { type: String, enum: Object.values(VisitDay) },
     particular_day: { type: String, enum: Object.values(Day), default: null },
@@ -124,15 +162,26 @@ const CommercialDetailsSchema = new Schema(
     maintenance_included: { type: String, default: "" },
     notice_needed: { type: String, enum: Object.values(NoticeNeededDuration) },
     internal_notes: { type: String, default: "" },
+    move_in_charges: { type: Number, default: 0 },
+    cam_charges: { type: Number, default: 0 },
+    building_plan_approval: { type: String, enum: Object.values(YesAndNo) },
+    fire_noc: { type: String, enum: Object.values(YesAndNo) },
 
-    //-------------office page fields -------------------
+    //------------- Office Specific -------------------
     monthly_rent: { type: Number, default: 0 },
-    // security_amount: Number,
-    cam_charges: {type:Number, default: 0},
-    building_plan_approval: {type:String, enum: Object.values(YesAndNo)},
-    fire_noc: {type:String, enum: Object.values(YesAndNo)},
-    move_in_charges: {type: Number, default: 0},
     sale_consideration: Number,
+    availablility_status: String,
+
+    //------------- Land Specific -------------------
+    visit_allowed: Boolean,
+    access_notes: String,
+    tax_govt_charges_included: { type: String, enum: Object.values(YesAndNo) },
+
+    //------------- Retail Specific -------------------
+    suitable_for: String,
+    oc: { type: String, enum: Object.values(YesAndNo) },
+    cam_charges_included: { type: String, enum: Object.values(YesAndNo) },
+    keys_occupation: String
   },
   noIdOption
 );
@@ -149,7 +198,11 @@ const ListingPropertyDetailsSchema = new Schema(
   {
     unit_no: String,
     project_name: String,
-    tower: String
+    tower: String,
+
+    //----------retail--------
+    floor_no: String,
+    tower_name: String,
   },
   noIdOption
 );
@@ -161,7 +214,16 @@ const ListingAddressSchema = new Schema(
     subregion: String,
     locality: String,
     city: String,
-    pincode: Number
+    pincode: Number,
+
+    //----------industrial------------
+    district: String,
+    taluka: String,
+    village: String,
+
+    //----------land----------------
+    google_map_link: String,
+    google_map_link_hide: { type: Boolean, default: false },
   },
   noIdOption
 );
@@ -183,6 +245,8 @@ const listingOnboardingSchema = new Schema(
     firm_name: String,
     broker_name: String,
     is_personalized: { type: Boolean, default: false },
+    vrTour: { type: String, default: "" }, //industrial only
+    coverImageKey: { type:String, default:""}, // indus, land, retail only
     listing_id: { type: String, required: true, unique: true, index: true },
     current_step: {
       type: String,
