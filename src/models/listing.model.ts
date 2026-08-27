@@ -150,7 +150,7 @@ const CommercialDetailsSchema = new Schema(
     end_time: String,
     discount_price: { type: Number, default: 0 },
     security_amount: { type: Number, default: 0 },
-    property_price: Number,
+    property_price: { type: Number, default: 0 },
     avg_rate_per_sqft: Number,
     brokerage_charge: { type: Number, default: 0 },
     tenantsPreferred: String,

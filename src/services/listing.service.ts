@@ -56,7 +56,7 @@ class ListingService {
         };
     }
     async getListingById(id: string, auth: AuthContext) {
-        const listing = await Listings.findOne({_id:id, "broker_and_agent.sub": auth.sub, "broker_and_agent.firm_id": auth.firm_id});
+        const listing = await Listings.findOne({_id:id, "broker_and_agent.sub": auth.sub, "broker_and_agent.firm_id": auth.firm_id}).lean();
         if (!listing) {
             throw new ApiError(404, "Listing not found");
         }
