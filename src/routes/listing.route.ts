@@ -10,10 +10,4 @@ router.route("/:id")
     .get(getListingById)
     .patch(updateListingStatus);
 
-    
-// router.route("/:id/status")
-    // .patch(updateListingStatus);
-// router.route("/:id/submit")
-//     .post(submitListing);
-
 export default router;

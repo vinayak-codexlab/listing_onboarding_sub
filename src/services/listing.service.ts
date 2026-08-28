@@ -65,7 +65,7 @@ class ListingService {
         });
         return {
             created: true,
-            lising : formatListingResponse(listing)
+            listing : formatListingResponse(listing)
         };
     }
     async getListingById(id: string, auth: AuthContext) {
