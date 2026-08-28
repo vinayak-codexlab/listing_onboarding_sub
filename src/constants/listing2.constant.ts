@@ -70,6 +70,10 @@ export enum NoticeNeededDuration{
   TWO_HOURS = "2_hours",
   SAME_DAY = "same_day",
   ONE_DAY = "1_day",
+  NO="no",
+  TWO_DAYS="2_days",
+  THREE_DAYS="3_days",
+
 }
 export enum CurrentOccupancy{
   OWNER_OCCUPIED = "owner_occupied",
@@ -149,7 +153,10 @@ export enum SourceOfWater{
   BOREWELL = "borewell",
   WELL = "well",
   CANAL = "canal",
+
   NONE = "none",
+  TANKER = "tanker",
+  OTHER = "other",
 }
 
 export enum SewageDrainage{
@@ -169,4 +176,38 @@ export enum ElectricityConnection{
   YES = "yes",
   NO = "no",
   NEARBY_AVAILABLE = "nearby_available",
+}
+
+//retail
+export enum FitOutCondition{
+  BARE_SHELL = "bare_shell",
+  WARM_SHELL = "warm_shell",
+  FURNISHED = "furnished",
+  SEMI_FURNISHED = "semi_furnished",
+  UNFURNISHED = "unfurnished",
+}
+
+export enum FlooringType{
+  VITRIFIED_TILE = "vitrified_tile",
+  MARBLE = "marble",
+  WOODEN = "wooden",
+  BARE_SHELL = "bare_shell",
+  NOT_DEFINED = "not_defined",
+}
+
+export enum VisibilityFrom {
+  MAIN_ROAD = "main_road",
+  INTERNAL_ROAD = "internal_road",
+  MARKET="market",
+  MALL_ATRIUM="mall_atrium",
+  CORNER="corner",
+  OTHER="other",
+}
+
+export enum KeysOccupancy {
+  WITH_OWNER = "with_owner",
+  WITH_BROKER = "with_broker",
+  WITH_SECURITY = "with_security",
+  TENANT_OCCUPIED = "tenant_occupied",
+  VACANT="vacant",
 }

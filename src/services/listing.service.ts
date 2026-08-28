@@ -2,6 +2,7 @@ import Listings from "../models/listing.model.js";
 import { ListingStatus, OnboardingStep } from "../constants/index.constant.js";
 import { ApiError } from "../utils/apiError.js";
 import { validateListingSubmission } from "../validations/submit.validation.js";
+import { formatListingResponse } from "../utils/responseFormatter.js";
 
 type AuthContext = {
     sub: string;
@@ -15,6 +16,18 @@ class ListingService {
     }
     async saveListing(data: Record<string, any>, auth: AuthContext) {
         const {_id, images, videos, listing_id, status, ...listingData } = data;
+
+        const restrictedFields = ['listing_status', 'sub', 'firm_id', 'listing_id'];
+        const forbiddenKey = Object.keys(data).find(key => 
+            restrictedFields.some(field => key === field || key.endsWith(`.${field}`))
+        );
+        const hasForbiddenNested = 
+            restrictedFields.some(field => data?.listing_details?.[field]) ||
+            restrictedFields.some(field => data?.broker_and_agent?.[field]);
+
+        if (forbiddenKey || hasForbiddenNested) {
+            throw new ApiError(400, `Invalid update payload: Modifying restricted authentication or status fields is not allowed.`);
+        }
         if (_id) {
             const listing = await Listings.findOneAndUpdate(
                 {
@@ -33,7 +46,7 @@ class ListingService {
             }
             return {
                 created: false,
-                listing
+                listing: formatListingResponse(listing)
             };
         }
         const listing = await Listings.create({
@@ -52,7 +65,7 @@ class ListingService {
         });
         return {
             created: true,
-            listing
+            lising : formatListingResponse(listing)
         };
     }
     async getListingById(id: string, auth: AuthContext) {
@@ -72,7 +85,7 @@ class ListingService {
         //     },
         //     videos: media?.videos ?? []
         // };
-        return listing;
+        return formatListingResponse(listing);
     }
     async updateListingStatus(id: string, status: ListingStatus, auth: AuthContext) {
         const listing = await Listings.findOne({_id:id,"broker_and_agent.sub":auth.sub,"broker_and_agent.firm_id":auth.firm_id});
@@ -94,7 +107,7 @@ class ListingService {
                 }
                 listing.set("listing_details.listing_status",ListingStatus.PENDING);
                 await listing.save();
-                return listing;
+                return formatListingResponse(listing);
             }
             case ListingStatus.APPROVED:
             case ListingStatus.REJECTED:{
@@ -103,7 +116,7 @@ class ListingService {
             case ListingStatus.DELISTED:{
                 listing.set("listing_details.listing_status", ListingStatus.DELISTED);
                 await listing.save();
-                return listing;
+                return formatListingResponse(listing);
             }
             case ListingStatus.RELISTED:{
                 if (listing.listing_details?.listing_status !== ListingStatus.DELISTED) {

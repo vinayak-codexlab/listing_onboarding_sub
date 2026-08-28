@@ -59,7 +59,7 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.completion_date": optionalDate,
   "listing_details.no_of_service_lifts": nonNegativeNumber,
   "listing_details.total_floor": optionalString,
-  "listing_details.flooring": optionalString,
+  "listing_details.flooring": z.nativeEnum(Constants.FlooringType).optional(),
   "listing_details.flooring_type": optionalString,
   "listing_details.no_of_balconies": optionalString,
   "listing_details.no_of_bathrooms": optionalString,
@@ -140,10 +140,10 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.constructed_area_unit_type": optionalString,
 
   // Listing Details - Retail Specific
-  "listing_details.fit_out_condition": optionalString,
+  "listing_details.fit_out_condition": z.nativeEnum(Constants.FitOutCondition).optional(),
   "listing_details.frontage": nonNegativeNumber,
   "listing_details.frontageType": optionalString,
-  "listing_details.visibility_from": optionalString,
+  "listing_details.visibility_from": z.nativeEnum(Constants.VisibilityFrom).optional(),
   "listing_details.signage_rights": optionalBoolean,
   "listing_details.display_area": optionalBoolean,
   "listing_details.mezzanine": optionalBoolean,
@@ -192,7 +192,7 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "commercial_details.suitable_for": optionalString,
   "commercial_details.oc": z.nativeEnum(Constants.YesAndNo).optional(),
   "commercial_details.cam_charges_included": z.nativeEnum(Constants.YesAndNo).optional(),
-  "commercial_details.keys_occupation": optionalString,
+  "commercial_details.keys_occupation": z.nativeEnum(Constants.KeysOccupancy).optional(),
 
   // Broker & Agent
   "broker_and_agent.sub": z.string().trim().min(1),
@@ -232,7 +232,7 @@ export const validateListingData = (data: Record<string, any>) => {
     if (
       key === "broker_and_agent.sub" || 
       key === "broker_and_agent.firm_id" || 
-      key === "listing_id" || 
+      key === "listing_id" ||
       key === "listing_details.listing_status"
     ) {
       throw new ApiError(400, `Field cannot be provided: ${key}`);

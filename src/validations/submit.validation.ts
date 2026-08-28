@@ -145,7 +145,7 @@ const validateUnitTypeFields = (listing: Record<string, any>, errors: string[]) 
 
     // INDUSTRIAL
     if (listing.listing_type === Constants.ListingType.INDUSTRIAL) {
-        if (isMissing(details?.unit_on_floor)) errors.push("listing_details.unit_on_floor");
+        // if (isMissing(details?.unit_on_floor)) errors.push("listing_details.unit_on_floor");
         if (isMissing(details?.area_unit_type)) errors.push("listing_details.area_unit_type");
 
         // // Conditional location checks based on region type
@@ -160,7 +160,7 @@ const validateUnitTypeFields = (listing: Record<string, any>, errors: string[]) 
     if (listing.listing_type === Constants.ListingType.RETAIL) {
         if (isMissing(details?.building_name)) errors.push("listing_details.building_name");
         if (isMissing(details?.unit_no)) errors.push("listing_details.unit_no");
-        if (isMissing(details?.unit_on_floor)) errors.push("listing_details.unit_on_floor");
+        // if (isMissing(details?.unit_on_floor)) errors.push("listing_details.unit_on_floor");
         if (isMissing(details?.building_status)) errors.push("listing_details.building_status");
         if (isMissing(details?.building_type)) errors.push("listing_details.building_type");
         if (isMissing(details?.unit_type)) errors.push("listing_details.unit_type");
