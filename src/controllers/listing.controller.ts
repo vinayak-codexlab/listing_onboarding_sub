@@ -23,16 +23,12 @@ export const listingOnboarding = asyncHandler(async(req:Request, res:Response) =
     });
 });
 export const getListingById = asyncHandler(async (req:Request, res:Response) => {
-    console.log("Step-1");
     if (!req.user) {
         res.status(401).json({success: false, message: "Unauthorized access"});
         return;
     }
-    console.log("Step-2");
     const id = objectIdSchema.parse(req.params.id);
-    console.log("step-3");
     const listing = await listingService.getListingById(id, getAuth(req));
-    console.log("step-4");
     res.status(200).json({
         success: true,
         data: listing
