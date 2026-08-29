@@ -73,7 +73,6 @@ class ListingService {
         if (!listing) {
             throw new ApiError(404, "Listing not found");
         }
-        //media services
         // const media = await Media.findOne({ listing_id: listing._id}).lean();
         // return {
         //     ...listing.toObject(),
