@@ -73,7 +73,6 @@ export enum NoticeNeededDuration{
   NO="no",
   TWO_DAYS="2_days",
   THREE_DAYS="3_days",
-
 }
 export enum CurrentOccupancy{
   OWNER_OCCUPIED = "owner_occupied",

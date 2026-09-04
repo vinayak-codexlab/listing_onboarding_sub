@@ -40,6 +40,7 @@ export enum LandUnitType{
     INDUSTRIAL_LAND = "industrial_land",
     FARM_HOUSE = "farm_house",
 }
+
 // listing status
 export enum ListingStatus{
     WORK_IN_PROGRESS = "work_in_progress",
@@ -64,3 +65,12 @@ export enum YesAndNo{
     YES = "yes",
     NO = "no",
 }
+
+//==========
+export const UNIT_TYPES_BY_LISTING_TYPE = {
+    [ListingType.HOME]: Object.values(HomeUnitType),
+    [ListingType.OFFICE]: Object.values(OfficeUnitType),
+    [ListingType.INDUSTRIAL]: Object.values(IndustrialUnitType),
+    [ListingType.RETAIL]: Object.values(RetailUnitType),
+    [ListingType.LAND]: Object.values(LandUnitType),
+} as const;

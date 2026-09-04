@@ -50,7 +50,8 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.exit_direction": z.nativeEnum(Constants.Direction).optional(),
   "listing_details.view": optionalString,
   "listing_details.project_type": z.nativeEnum(Constants.ProjectType).optional(),
-  "listing_details.unit_type": z.nativeEnum(Constants.HomeUnitType).optional(),
+  // "listing_details.unit_type": z.nativeEnum(Constants.UnitType).optional(),
+  "listing_details.unit_type": z.string().trim().optional(),
   "listing_details.area_unit_type": z.nativeEnum(Constants.AreaUnitType).optional(),
   "listing_details.plot_area_unit_type": z.nativeEnum(Constants.PlotAreaUnitType).optional(),
   "listing_details.plot_area": optionalNullableString,
@@ -255,6 +256,22 @@ export const validateListingData = (data: Record<string, any>) => {
       );
     }
   }
+
+  // Validate listing_type + unit_type combination
+  const listingType = data.listing_type;
+  const unitType = data["listing_details.unit_type"];
+
+  if (listingType && unitType) {
+    const allowedUnitTypes = 
+      Constants.UNIT_TYPES_BY_LISTING_TYPE[
+        listingType as keyof typeof Constants.UNIT_TYPES_BY_LISTING_TYPE
+      ];
+
+    if (!allowedUnitTypes?.includes(unitType as never)) {
+      throw new ApiError(400,`Invalid unit_type '${unitType}' for listing_type '${listingType}'`);
+    }
+  }
+
   return data;
 };
 
