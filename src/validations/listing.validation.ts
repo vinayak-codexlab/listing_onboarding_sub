@@ -200,7 +200,7 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "broker_and_agent.firm_id": objectIdSchema,
 
   // Key Features
-  key_features: z.array(z.string().trim().min(1, "Key feature cannot be empty")),
+  key_features: z.array(z.string().trim().min(1, "min length should be 1")),
 
   // Property Details
   "property_details.unit_no": optionalString,
@@ -255,6 +255,19 @@ export const validateListingData = (data: Record<string, any>) => {
         result.error.issues[0]?.message ?? `Invalid value for ${key}`
       );
     }
+  }
+
+  const propertyPrice = data["commercial_details.property_price"];
+  const discountPrice = data["commercial_details.discount_price"];
+  if (
+    propertyPrice !== undefined &&
+    discountPrice !== undefined &&
+    (discountPrice > propertyPrice || discountPrice < propertyPrice * 0.8)
+  ) {
+    throw new ApiError(
+      400,
+      "commercial_details.discount_price must be between 80% and 100% of property_price"
+    );
   }
 
   // Validate listing_type + unit_type combination

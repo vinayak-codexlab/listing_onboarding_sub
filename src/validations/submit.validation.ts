@@ -34,9 +34,19 @@ const validateCommonSubmissionFields = (listing: Record<string, any>, errors: st
         if (isMissing(commercial?.property_price)) errors.push("commercial_details.property_price");
     }
 
+    const propertyPrice = Number(commercial?.property_price);
+    const discountPrice = Number(commercial?.discount_price);
+    if (
+        !isMissing(commercial?.property_price) &&
+        !isMissing(commercial?.discount_price) &&
+        (discountPrice > propertyPrice || discountPrice < propertyPrice * 0.8)
+    ) {
+        errors.push("commercial_details.discount_price (must be between 80% and 100% of property_price)");
+    }
+
     // Key Features - COMMON
-    if (!Array.isArray(listing.key_features) || listing.key_features.length < 5) {
-        errors.push("key_features (minimum 5 required)");
+    if (!Array.isArray(listing.key_features) || listing.key_features.length < 5 || listing.key_features.length > 10) {
+        errors.push("key_features (required 5-10 key features only)");
     }
 };
 
