@@ -4,6 +4,7 @@ import { ApiError } from "../utils/apiError.js";
 import { validateListingSubmission } from "../validations/submit.validation.js";
 import { formatListingResponse } from "../utils/responseFormatter.js";
 
+//auth
 type AuthContext = {
     sub: string;
     firm_id: string;
