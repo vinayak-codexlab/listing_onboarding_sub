@@ -4,7 +4,8 @@ import { ApiError } from "../utils/apiError.js";
 
 // Reusable Validators
 export const objectIdSchema = z.string().trim().regex(/^[a-f\d]{24}$/i, "Invalid ObjectId");
-const optionalString = z.string().trim().min(1, "Field cannot be empty").regex(/^[^<>]*$/, "HTML is not allowed").optional();
+const optionalString = z.string().trim().min(1, "Field cannot be empty").regex(/^[^<>]*$/, "HTML is not allowed").refine(
+    (value) =>!/(?:\b(?:alert|confirm|prompt|eval)\s*\(|javascript\s*:|\bon\w+\s*=)/i.test(value),"Script-like content is not allowed").optional();
 const optionalNullableString = z.string().trim().optional().nullable();
 const optionalNumber = z.coerce.number().optional();
 const nonNegativeNumber = z.coerce.number().min(0).optional();
@@ -20,6 +21,8 @@ const optionalListingName = z
   .min(1, "Listing name cannot be empty")
   .max(240, "Listing name cannot exceed 240 characters")
   .regex(/^[^<>]*$/, "HTML is not allowed")
+  .refine(
+    (value) =>!/(?:\b(?:alert|confirm|prompt|eval)\s*\(|javascript\s*:|\bon\w+\s*=)/i.test(value),"Script-like content is not allowed")
   .optional();
   const optionalFloorNumber = z.preprocess(
   (value) => {
@@ -50,12 +53,47 @@ const optionalListingName = z
   .nullable()
   .optional();
 
-  const optionalPincode = z.coerce
+const optionalPincode = z.coerce
   .number()
   .int("Pincode must be a whole number")
   .min(100000, "Pincode must contain exactly 6 digits")
   .max(999999, "Pincode must contain exactly 6 digits")
   .optional();
+
+type ListingData = Record<string, any>;
+
+const PROTECTED_FIELDS = new Set([
+  "broker_and_agent.sub",
+  "broker_and_agent.firm_id",
+  "listing_id",
+  "listing_details.listing_status",
+  "status",
+  "listing_status"
+]);
+
+const REQUIRED_CREATE_FIELDS = [
+  "listing_type",
+  "current_step",
+  "onboarding_type"
+] as const;
+
+const ALLOWED_LISTING_TYPES_BY_FIELD: Record<string, Constants.ListingType[]> = {
+  "listing_details.ceiling_height": [
+    Constants.ListingType.HOME,
+    Constants.ListingType.OFFICE,
+    Constants.ListingType.INDUSTRIAL,
+    Constants.ListingType.RETAIL
+  ],
+  "listing_details.total_floor": [
+    Constants.ListingType.HOME,
+    Constants.ListingType.OFFICE,
+    Constants.ListingType.INDUSTRIAL,
+    Constants.ListingType.RETAIL
+  ],
+  "listing_details.power_in_KA": [Constants.ListingType.INDUSTRIAL],
+  "listing_details.truck_access": [Constants.ListingType.INDUSTRIAL],
+  "listing_details.lorry_bay_area": [Constants.ListingType.INDUSTRIAL]
+};
 
   // Flat Listing Field Validation
 const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
@@ -274,77 +312,67 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   apartmentAmenities: z.array(z.string())
 };
 
-export const validateListingData = (data: Record<string, any>) => {
+const isListingField = (key: string) =>
+  key.startsWith("listing_details.") ||
+  key.startsWith("commercial_details.") ||
+  key.startsWith("property_details.") ||
+  key.startsWith("listing_address.") ||
+  key === "key_features" ||
+  key === "furnishingAmenities" ||
+  key === "apartmentAmenities";
 
+const hasMeaningfulValue = (value: unknown) => {
+  if (value === undefined || value === null) return false;
+  if (typeof value === "string") return value.trim().length > 0;
+  if (Array.isArray(value)) return value.length > 0;
+  return true;
+};
+
+const validateRequestBody: (
+  data: unknown
+) => asserts data is ListingData = (data) => {
   if (
-  data === null ||
-  typeof data !== "object" ||
-  Array.isArray(data) ||
-  Object.keys(data).length === 0
-) {
-  throw new ApiError(400, "Request body cannot be empty");
-}
+    data === null ||
+    typeof data !== "object" ||
+    Array.isArray(data) ||
+    Object.keys(data).length === 0
+  ) {
+    throw new ApiError(400, "Request body cannot be empty");
+  }
+};
 
-const isUpdate = data._id !== undefined;
-
-if (!isUpdate) {
-  const requiredCreateFields = [
-    "listing_type",
-    "current_step",
-    "onboarding_type"
-  ];
-
-  for (const field of requiredCreateFields) {
-    if (
-      data[field] === undefined ||
-      data[field] === null ||
-      (
-        typeof data[field] === "string" &&
-        data[field].trim() === ""
-      )
-    ) {
-      throw new ApiError(
-        400,
-        `${field} is required`
-      );
+const validateCreateRequirements = (data: ListingData) => {
+  for (const field of REQUIRED_CREATE_FIELDS) {
+    if (!hasMeaningfulValue(data[field])) {
+      throw new ApiError(400, `${field} is required`);
     }
   }
 
-  const hasListingData = Object.keys(data).some(
-    (key) =>
-      key.startsWith("listing_details.") ||
-      key.startsWith("commercial_details.") ||
-      key.startsWith("property_details.") ||
-      key.startsWith("listing_address.") ||
-      key === "key_features" ||
-      key === "furnishingAmenities" ||
-      key === "apartmentAmenities"
+  const hasListingData = Object.entries(data).some(
+    ([key, value]) => isListingField(key) && hasMeaningfulValue(value)
   );
 
   if (!hasListingData) {
-    throw new ApiError(
-      400,
-      "At least one listing field is required"
-    );
+    throw new ApiError(400, "At least one non-empty listing field is required");
   }
-}
-  for (const [key, value] of Object.entries(data)) {
-    // Server-controlled protected fields
-    if (
-      key === "broker_and_agent.sub" || 
-      key === "broker_and_agent.firm_id" || 
-      key === "listing_id" ||
-      key === "listing_details.listing_status" ||
-      key === "status" ||
-      key === "listing_status"
-    ) {
-      throw new ApiError(400, `Field cannot be provided: ${key}`);
-    }
-    if (value !== null && typeof value === "object" && !Array.isArray(value)) {
-      throw new ApiError(400, `Provide '${key}' data in dot notation form`);
-    }
+};
 
-    // Validate field using dot-notation schemas
+const validateFieldIsAllowed = (key: string, value: unknown) => {
+  if (PROTECTED_FIELDS.has(key)) {
+    throw new ApiError(400, `Field cannot be provided: ${key}`);
+  }
+
+  if (value !== null && typeof value === "object" && !Array.isArray(value)) {
+    throw new ApiError(400, `Provide '${key}' data in dot notation form`);
+  }
+};
+
+const validateFields = (data: ListingData): ListingData => {
+  const parsedData: ListingData = {};
+
+  for (const [key, value] of Object.entries(data)) {
+    validateFieldIsAllowed(key, value);
+
     const schema = listingFieldSchemas[key];
     if (!schema) {
       throw new ApiError(400, `Invalid field: ${key}`);
@@ -357,10 +385,23 @@ if (!isUpdate) {
         result.error.issues[0]?.message ?? `Invalid value for ${key}`
       );
     }
+
+    parsedData[key] = result.data;
   }
 
+  return parsedData;
+};
+
+const validatePricingRules = (data: ListingData) => {
   const propertyPrice = data["commercial_details.property_price"];
   const discountPrice = data["commercial_details.discount_price"];
+  const propertyPurpose = data["commercial_details.property_purpose"];
+  const securityAmount = data["commercial_details.security_amount"];
+  const stampDuty = data["commercial_details.stamp_duty"];
+  const monthlyRent = data["commercial_details.monthly_rent"];
+  const maintenanceIncluded = data["commercial_details.maintenance_included"];
+  const maintenanceCharges = data["commercial_details.maintenance_charges"];
+
   if (
     propertyPrice !== undefined &&
     discountPrice !== undefined &&
@@ -372,246 +413,182 @@ if (!isUpdate) {
     );
   }
 
-  // Validate listing_type + unit_type combination
+  if (
+    propertyPurpose === Constants.PropertyPurpose.SECONDARY_SALE &&
+    securityAmount !== undefined
+  ) {
+    throw new ApiError(400, "security_amount is only allowed for rent/lease listings");
+  }
+
+  if (
+    propertyPurpose === Constants.PropertyPurpose.RENT_LEASE &&
+    stampDuty !== undefined
+  ) {
+    throw new ApiError(400, "stamp_duty is only allowed for secondary_sale listings");
+  }
+
+  if (
+    propertyPurpose === Constants.PropertyPurpose.SECONDARY_SALE &&
+    monthlyRent !== undefined
+  ) {
+    throw new ApiError(400, "monthly_rent is only allowed for rent/lease listings");
+  }
+
+  if (
+    maintenanceIncluded === Constants.YesAndNo.YES &&
+    maintenanceCharges !== undefined &&
+    maintenanceCharges > 0
+  ) {
+    throw new ApiError(
+      400,
+      "maintenance_charges must be zero or omitted when maintenance is included"
+    );
+  }
+};
+
+const validateListingTypeRules = (data: ListingData) => {
   const listingType = data.listing_type;
   const unitType = data["listing_details.unit_type"];
 
   if (listingType && unitType) {
-    const allowedUnitTypes = 
+    const allowedUnitTypes =
       Constants.UNIT_TYPES_BY_LISTING_TYPE[
         listingType as keyof typeof Constants.UNIT_TYPES_BY_LISTING_TYPE
       ];
 
     if (!allowedUnitTypes?.includes(unitType as never)) {
-      throw new ApiError(400,`Invalid unit_type '${unitType}' for listing_type '${listingType}'`);
-    }
-  }
-
-  //validate start_time and end_time
-  const startTime = data["commercial_details.start_time"];
-  const endTime = data["commercial_details.end_time"];
-
-if (startTime !== undefined && endTime !== undefined) {
-  const toMinutes = (time: string) => {
-    const [hours, minutes] = time.split(":").map(Number);
-    return hours! * 60 + minutes!;
-  };
-
-  if (toMinutes(endTime) <= toMinutes(startTime)) {
-    throw new ApiError(
-      400,
-      "end_time must be later than start_time"
-    );
-  }
-}
-
-//validate that combine_unit_no does not include the primary unit_no
-const unitNo = data["listing_details.unit_no"];
-const combinedUnits =
-  data["listing_details.combine_unit_no"];
-
-if (
-  unitNo !== undefined &&
-  combinedUnits?.includes(unitNo)
-) {
-  throw new ApiError(
-    400,
-    "combine_unit_no cannot include the primary unit_no"
-  );
-}
-
-// Validate furnishingAmenities for land listings
-if (
-  data.listing_type === Constants.ListingType.LAND &&
-  data.furnishingAmenities !== undefined
-) {
-  throw new ApiError(
-    400,
-    "furnishingAmenities is not allowed for land listings"
-  );
-}
-
-
-// Validate security_amount for secondary_sale listings
-const propertyPurpose =
-  data["commercial_details.property_purpose"];
-
-const securityAmount =
-  data["commercial_details.security_amount"];
- 
-if (
-  propertyPurpose === Constants.PropertyPurpose.SECONDARY_SALE &&
-  securityAmount !== undefined
-) {
-  throw new ApiError(
-    400,
-    "security_amount is only allowed for rent/lease listings"
-  );
-}
-
-// Validate stamp_duty for rent/lease listings
-const stampDuty =
-  data["commercial_details.stamp_duty"];
-
-if (
-  propertyPurpose === Constants.PropertyPurpose.RENT_LEASE &&
-  stampDuty !== undefined
-) {
-  throw new ApiError(
-    400,
-    "stamp_duty is only allowed for secondary_sale listings"
-  );
-}
-
-const allowedListingTypesByField: Record<string,Constants.ListingType[]> = {
-  "listing_details.ceiling_height": [
-    Constants.ListingType.HOME,
-    Constants.ListingType.OFFICE,
-    Constants.ListingType.INDUSTRIAL,
-    Constants.ListingType.RETAIL
-  ],
-
-  "listing_details.total_floor": [
-    Constants.ListingType.HOME,
-    Constants.ListingType.OFFICE,
-    Constants.ListingType.INDUSTRIAL,
-    Constants.ListingType.RETAIL
-  ],
-
-  "listing_details.power_in_KA": [
-    Constants.ListingType.INDUSTRIAL
-  ],
-
-  "listing_details.truck_access": [
-    Constants.ListingType.INDUSTRIAL
-  ],
-
-  "listing_details.lorry_bay_area": [
-    Constants.ListingType.INDUSTRIAL
-  ]
-};
-
-// Validate that certain fields are only provided for allowed listing types
-if (listingType) {
-  for (const [field, allowedListingTypes] of Object.entries(
-    allowedListingTypesByField
-  )) {
-    const fieldWasProvided = data[field] !== undefined;
-
-    if (
-      fieldWasProvided &&
-      !allowedListingTypes.includes(listingType)
-    ) {
       throw new ApiError(
         400,
-        `${field} is not allowed for listing_type '${listingType}'`
+        `Invalid unit_type '${unitType}' for listing_type '${listingType}'`
       );
     }
   }
-}
 
-// Validate that particular_day is provided when visit_day is particular_day
-const visitDay =
-  data["commercial_details.visit_day"];
+  if (listingType) {
+    for (const [field, allowedTypes] of Object.entries(ALLOWED_LISTING_TYPES_BY_FIELD)) {
+      if (data[field] !== undefined && !allowedTypes.includes(listingType)) {
+        throw new ApiError(
+          400,
+          `${field} is not allowed for listing_type '${listingType}'`
+        );
+      }
+    }
+  }
 
- const particularDay =
-   data["commercial_details.particular_day"];
-
-if (visitDay === Constants.VisitDay.PARTICULAR_DAY && particularDay == null)
-  {
-    throw new ApiError(400,"commercial_details.particular_day is required when visit_day is particular_day");
+  if (
+    listingType === Constants.ListingType.LAND &&
+    data["listing_details.area_type"] !== undefined
+  ) {
+    throw new ApiError(400, "invalid area_type");
+  }
 };
 
-// Validate that area_type is not provided for land listings
-const areaType =
-  data["listing_details.area_type"];
+const toMinutes = (time: string) => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours! * 60 + minutes!;
+};
 
-if (
-  listingType === Constants.ListingType.LAND &&
-  areaType !== undefined
-) {
-  throw new ApiError(400,"invalid area_type");
-}
+const validateVisitRules = (data: ListingData) => {
+  const startTime = data["commercial_details.start_time"];
+  const endTime = data["commercial_details.end_time"];
+  const visitDay = data["commercial_details.visit_day"];
+  const particularDay = data["commercial_details.particular_day"];
 
-const monthlyRent =
-  data["commercial_details.monthly_rent"];
-
-const maintenanceIncluded =
-  data["commercial_details.maintenance_included"];
-
-const maintenanceCharges =
-  data["commercial_details.maintenance_charges"];
-
-// Validate that monthly_rent is only provided for rent/lease listings
-if (propertyPurpose === Constants.PropertyPurpose.SECONDARY_SALE &&
-  monthlyRent !== undefined) {
-    throw new ApiError(400,"monthly_rent is only allowed for rent/lease listings");
-}
-
-// Validate that maintenance_charges is only provided when maintenance_included is "no"
-if (
-  maintenanceIncluded === Constants.YesAndNo.YES &&
-  maintenanceCharges !== undefined &&
-  maintenanceCharges > 0
-) {
-  throw new ApiError(
-    400,
-    "maintenance_charges must be zero or omitted when maintenance is included"
-  );
-}
-
-// Validate that floor_no is not greater than total_floor
-const floorNumber =
-  data["listing_details.floor_no"];
-
-const totalFloors =
-  data["listing_details.total_floor"];
-
-if (
-  floorNumber !== undefined &&
-  totalFloors !== undefined &&
-  floorNumber > totalFloors
-) {
-  throw new ApiError(
-    400,
-    "floor_no cannot be greater than total_floor"
-  );
-}
-
-// Validate that apartmentAmenities is only provided for home listings
-const apartmentAmenities = data.apartmentAmenities;
-if (
-  apartmentAmenities !== undefined &&
-  listingType !== Constants.ListingType.HOME
-) {
-  throw new ApiError(
-    400,
-    "apartmentAmenities is only allowed for home listings"
-  );
-}
-
-const availabilityStatus =
-  data["commercial_details.availability_status"];
-
-const availableFrom =
-  data["commercial_details.available_from"];
   if (
-  availabilityStatus === "under_construction" &&
-  typeof availableFrom === "string"
-) {
-  const availableTimestamp = new Date(
-    availableFrom
-  ).getTime();
+    startTime !== undefined &&
+    endTime !== undefined &&
+    toMinutes(endTime) <= toMinutes(startTime)
+  ) {
+    throw new ApiError(400, "end_time must be later than start_time");
+  }
 
-  if (availableTimestamp < Date.now()) {
+  if (
+    visitDay === Constants.VisitDay.PARTICULAR_DAY &&
+    particularDay == null
+  ) {
+    throw new ApiError(
+      400,
+      "commercial_details.particular_day is required when visit_day is particular_day"
+    );
+  }
+};
+
+const validatePropertyRules = (data: ListingData) => {
+  const unitNo = data["listing_details.unit_no"];
+  const combinedUnits = data["listing_details.combine_unit_no"];
+  const floorNumber = data["listing_details.floor_no"];
+  const totalFloors = data["listing_details.total_floor"];
+
+  if (unitNo !== undefined && combinedUnits?.includes(unitNo)) {
+    throw new ApiError(
+      400,
+      "combine_unit_no cannot include the primary unit_no"
+    );
+  }
+
+  if (
+    floorNumber !== undefined &&
+    totalFloors !== undefined &&
+    floorNumber > Number(totalFloors)
+  ) {
+    throw new ApiError(400, "floor_no cannot be greater than total_floor");
+  }
+};
+
+const validateAmenityRules = (data: ListingData) => {
+  const listingType = data.listing_type;
+
+  if (
+    listingType === Constants.ListingType.LAND &&
+    data.furnishingAmenities !== undefined
+  ) {
+    throw new ApiError(400, "furnishingAmenities is not allowed for land listings");
+  }
+
+  if (
+    data.apartmentAmenities !== undefined &&
+    listingType !== Constants.ListingType.HOME
+  ) {
+    throw new ApiError(400, "apartmentAmenities is only allowed for home listings");
+  }
+};
+
+const validateAvailabilityRules = (data: ListingData) => {
+  const availabilityStatus = data["commercial_details.availability_status"];
+  const availableFrom = data["commercial_details.available_from"];
+
+  if (
+    availabilityStatus === "under_construction" &&
+    typeof availableFrom === "string" &&
+    new Date(availableFrom).getTime() < Date.now()
+  ) {
     throw new ApiError(
       400,
       "available_from must be a future date when availability_status is under_construction"
     );
   }
-}
+};
 
-  return data;
+export const validateListingBusinessRules = (data: ListingData) => {
+  validatePricingRules(data);
+  validateListingTypeRules(data);
+  validateVisitRules(data);
+  validatePropertyRules(data);
+  validateAmenityRules(data);
+  validateAvailabilityRules(data);
+};
+
+export const validateListingData = (input: unknown) => {
+  validateRequestBody(input);
+
+  if (input._id === undefined) {
+    validateCreateRequirements(input);
+  }
+
+  const parsedData = validateFields(input);
+  validateListingBusinessRules(parsedData);
+
+  return parsedData;
 };
 
 // Status Action Validator

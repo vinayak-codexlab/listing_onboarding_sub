@@ -34,7 +34,7 @@ beforeEach(() => {
 });
 
 describe("Listing endpoints", () => {
-    describe("POST /v1/user/listing/listing-onboarding", () => {
+    describe("POST /v1/listing/onboarding", () => {
         it("creates a listing", async () => {
             const listing = {
                 _id: listingId,
@@ -48,11 +48,13 @@ describe("Listing endpoints", () => {
             });
 
             const response = await request(app)
-                .post("/v1/user/listing/listing-onboarding")
+                .post("/v1/listing/onboarding")
                 .set(auth)
                 .send({
                     listing_type: "home",
-                    current_step: "essential"
+                    current_step: "essential",
+                    onboarding_type: "manual",
+                    "listing_details.listing_name": "Test listing"
                 });
 
             expect(response.status).toBe(201);
@@ -62,7 +64,12 @@ describe("Listing endpoints", () => {
                 data: listing
             });
             expect(service.saveListing).toHaveBeenCalledWith(
-                { listing_type: "home", current_step: "essential" },
+                {
+                    listing_type: "home",
+                    current_step: "essential",
+                    onboarding_type: "manual",
+                    "listing_details.listing_name": "Test listing"
+                },
                 { sub: "user-123", firm_id: "507f1f77bcf86cd799439012" }
             );
         });
@@ -72,7 +79,7 @@ describe("Listing endpoints", () => {
             service.saveListing.mockResolvedValue({ created: false, listing });
 
             const response = await request(app)
-                .post("/v1/user/listing/listing-onboarding")
+                .post("/v1/listing/onboarding")
                 .set(auth)
                 .send({ _id: listingId, listing_type: "home" });
 
@@ -83,7 +90,7 @@ describe("Listing endpoints", () => {
 
         it("rejects an unauthenticated request", async () => {
             const response = await request(app)
-                .post("/v1/user/listing/listing-onboarding")
+                .post("/v1/listing/onboarding")
                 .send({
                     listing_type: "home",
                     current_step: "essential"
@@ -102,7 +109,7 @@ describe("Listing endpoints", () => {
             );
 
             const response = await request(app)
-                .post("/v1/user/listing/listing-onboarding")
+                .post("/v1/listing/onboarding")
                 .set("Authorization", `Bearer ${expiredToken}`)
                 .send({ listing_type: "home", current_step: "essential" });
 
@@ -112,7 +119,7 @@ describe("Listing endpoints", () => {
 
         it("rejects an invalid listing field", async () => {
             const response = await request(app)
-                .post("/v1/user/listing/listing-onboarding")
+                .post("/v1/listing/onboarding")
                 .set(auth)
                 .send({
                     invalid_field: "value"
@@ -125,10 +132,12 @@ describe("Listing endpoints", () => {
 
         it("rejects protected fields before calling the service", async () => {
             const response = await request(app)
-                .post("/v1/user/listing/listing-onboarding")
+                .post("/v1/listing/onboarding")
                 .set(auth)
                 .send({
                     listing_type: "home",
+                    current_step: "essential",
+                    onboarding_type: "manual",
                     "listing_details.listing_status": "approved"
                 });
 
@@ -138,7 +147,7 @@ describe("Listing endpoints", () => {
         });
     });
 
-    describe("GET /v1/user/listing/listing-onboarding/:id", () => {
+    describe("GET /v1/listing/onboarding/:id", () => {
         it("returns a listing", async () => {
             const listing = {
                 _id: listingId,
@@ -153,7 +162,7 @@ describe("Listing endpoints", () => {
             service.getListingById.mockResolvedValue(listing);
 
             const response = await request(app)
-                .get(`/v1/user/listing/listing-onboarding/${listingId}`)
+                .get(`/v1/listing/onboarding/${listingId}`)
                 .set(auth);
 
             expect(response.status).toBe(200);
@@ -171,7 +180,7 @@ describe("Listing endpoints", () => {
 
         it("rejects an invalid ObjectId", async () => {
             const response = await request(app)
-                .get("/v1/user/listing/listing-onboarding/not-an-object-id")
+                .get("/v1/listing/onboarding/not-an-object-id")
                 .set(auth);
 
             expect(response.status).toBe(400);
@@ -185,7 +194,7 @@ describe("Listing endpoints", () => {
             );
 
             const response = await request(app)
-                .get(`/v1/user/listing/listing-onboarding/${listingId}`)
+                .get(`/v1/listing/onboarding/${listingId}`)
                 .set(auth);
 
             expect(response.status).toBe(404);
@@ -199,7 +208,7 @@ describe("Listing endpoints", () => {
             service.getListingById.mockRejectedValue(new Error("Database offline"));
 
             const response = await request(app)
-                .get(`/v1/user/listing/listing-onboarding/${listingId}`)
+                .get(`/v1/listing/onboarding/${listingId}`)
                 .set(auth);
 
             expect(response.status).toBe(500);
@@ -210,7 +219,7 @@ describe("Listing endpoints", () => {
         });
     });
 
-    describe("PATCH /v1/user/listing/listing-onboarding/:id", () => {
+    describe("PATCH /v1/listing/onboarding/:id", () => {
         it("updates the listing status", async () => {
             const listing = {
                 _id: listingId,
@@ -222,7 +231,7 @@ describe("Listing endpoints", () => {
             service.updateListingStatus.mockResolvedValue(listing);
 
             const response = await request(app)
-                .patch(`/v1/user/listing/listing-onboarding/${listingId}`)
+                .patch(`/v1/listing/onboarding/${listingId}`)
                 .set(auth)
                 .send({
                     action: "delisted"
@@ -238,7 +247,7 @@ describe("Listing endpoints", () => {
 
         it("rejects an invalid status action", async () => {
             const response = await request(app)
-                .patch(`/v1/user/listing/listing-onboarding/${listingId}`)
+                .patch(`/v1/listing/onboarding/${listingId}`)
                 .set(auth)
                 .send({
                     action: "invalid-status"
@@ -261,7 +270,7 @@ describe("Listing endpoints", () => {
             service.updateListingStatus.mockResolvedValue(listing);
 
             const response = await request(app)
-                .patch(`/v1/user/listing/listing-onboarding/${listingId}`)
+                .patch(`/v1/listing/onboarding/${listingId}`)
                 .set(auth)
                 .send({ action });
 
@@ -279,7 +288,7 @@ describe("Listing endpoints", () => {
             );
 
             const response = await request(app)
-                .patch(`/v1/user/listing/listing-onboarding/${listingId}`)
+                .patch(`/v1/listing/onboarding/${listingId}`)
                 .set(auth)
                 .send({ action: "approved" });
 
@@ -291,7 +300,7 @@ describe("Listing endpoints", () => {
 
         it("rejects an invalid ObjectId", async () => {
             const response = await request(app)
-                .patch("/v1/user/listing/listing-onboarding/not-an-object-id")
+                .patch("/v1/listing/onboarding/not-an-object-id")
                 .set(auth)
                 .send({ action: "delisted" });
 
@@ -301,7 +310,7 @@ describe("Listing endpoints", () => {
 
         it("rejects an unauthenticated request", async () => {
             const response = await request(app)
-                .patch(`/v1/user/listing/listing-onboarding/${listingId}`)
+                .patch(`/v1/listing/onboarding/${listingId}`)
                 .send({
                     action: "delisted"
                 });
