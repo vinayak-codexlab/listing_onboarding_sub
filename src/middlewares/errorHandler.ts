@@ -4,18 +4,6 @@ import { ApiError } from "../utils/apiError.js";
 
 export const errorHandler = (error: Error, req:Request, res:Response, next:NextFunction)=>{
     console.error("[ERROR]", error.name, error.message);
-
-    const bodyParserError = error as Error & {
-  type?: string;
-  status?: number;
-};
-
-if (bodyParserError.type === "entity.parse.failed") {
-  return res.status(400).json({
-    success: false,
-    message: "Request body must contain valid JSON"
-  });
-}
     
     if (error instanceof ZodError) {
         return res.status(400).json({

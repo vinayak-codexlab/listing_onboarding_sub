@@ -1,9 +1,5 @@
 import Listings from "../models/listing.model.js";
-import {
-    ListingStatus,
-    OnboardingStep,
-    UNIT_TYPES_BY_LISTING_TYPE
-} from "../constants/index.constant.js";
+import { ListingStatus, OnboardingStep } from "../constants/index.constant.js";
 import { ApiError } from "../utils/apiError.js";
 import { validateListingSubmission } from "../validations/submit.validation.js";
 import { formatListingResponse } from "../utils/responseFormatter.js";
@@ -34,41 +30,12 @@ class ListingService {
             throw new ApiError(400, `Invalid update payload: Modifying restricted authentication or status fields is not allowed.`);
         }
         if (_id) {
-            const filter = {
-                _id,
-                "broker_and_agent.sub": auth.sub,
-                "broker_and_agent.firm_id": auth.firm_id
-            };
-
-            // A partial update may contain only listing_type or unit_type, so
-            // validate the resulting combination against the existing listing.
-            const existingListing = await Listings.findOne(filter);
-            if (!existingListing) {
-                throw new ApiError(404, "Listing not found");
-            }
-
-            const nextListingType =
-                listingData.listing_type ?? existingListing.listing_type;
-            const nextUnitType =
-                listingData["listing_details.unit_type"] ??
-                existingListing.listing_details?.unit_type;
-
-            if (nextListingType && nextUnitType) {
-                const allowedUnitTypes =
-                    UNIT_TYPES_BY_LISTING_TYPE[
-                        nextListingType as keyof typeof UNIT_TYPES_BY_LISTING_TYPE
-                    ];
-
-                if (!allowedUnitTypes?.includes(nextUnitType as never)) {
-                    throw new ApiError(
-                        400,
-                        `unit_type '${nextUnitType}' is not valid for listing_type '${nextListingType}'`
-                    );
-                }
-            }
-
             const listing = await Listings.findOneAndUpdate(
-                filter,
+                {
+                    _id,
+                    "broker_and_agent.sub": auth.sub,
+                    "broker_and_agent.firm_id": auth.firm_id
+                },
                 { $set:listingData },
                 {
                     new: true,
@@ -191,3 +158,4 @@ class ListingService {
 }
 const listingService = new ListingService();
 export default listingService;
+
