@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Listing Onboarding API - Unit Test Report</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #dce3ec;
+      --panel: #f7f9fc;
+      --pass: #087a4b;
+      --pass-bg: #eaf8f1;
+      --pending: #9a5b00;
+      --pending-bg: #fff5df;
+      --brand: #3157d5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: #eef2f7;
+      color: var(--ink);
+      font: 14px/1.55 Inter, ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 32px auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 18px 48px rgba(31, 45, 68, 0.09);
+      overflow: hidden;
+    }
+
+    header {
+      padding: 32px 36px;
+      color: #fff;
+      background: linear-gradient(135deg, #243b7a, var(--brand));
+    }
+
+    header h1 { margin: 0 0 6px; font-size: 28px; }
+    header p { margin: 0; opacity: 0.88; }
+
+    .content { padding: 28px 36px 40px; }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
+    .card {
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel);
+    }
+
+    .card strong { display: block; font-size: 25px; color: var(--pass); }
+    .card span { color: var(--muted); }
+
+    h2 {
+      margin: 30px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid var(--line);
+      font-size: 19px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0 20px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th { background: var(--panel); font-weight: 650; }
+
+    code {
+      padding: 2px 5px;
+      border-radius: 4px;
+      background: #edf1f7;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      overflow-x: auto;
+      padding: 14px 16px;
+      color: #e8edf7;
+      background: #172033;
+      border-radius: 9px;
+    }
+
+    pre code { padding: 0; color: inherit; background: transparent; }
+
+    .badge {
+      display: inline-block;
+      min-width: 62px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      text-align: center;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pass { color: var(--pass); background: var(--pass-bg); }
+    .pending { color: var(--pending); background: var(--pending-bg); }
+
+    .note {
+      padding: 13px 15px;
+      border-left: 4px solid var(--brand);
+      background: #f1f5ff;
+    }
+
+    .toolbar { margin: 0 0 18px; text-align: right; }
+
+    button {
+      padding: 9px 14px;
+      color: #fff;
+      background: var(--brand);
+      border: 0;
+      border-radius: 7px;
+      cursor: pointer;
+    }
+
+    footer {
+      margin-top: 32px;
+      padding-top: 16px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      font-size: 12px;
+    }
+
+    @media (max-width: 760px) {
+      .summary { grid-template-columns: repeat(2, 1fr); }
+      .content, header { padding-left: 20px; padding-right: 20px; }
+      table { display: block; overflow-x: auto; }
+    }
+
+    @media print {
+      body { background: #fff; }
+      main { width: 100%; margin: 0; border: 0; box-shadow: none; }
+      .toolbar { display: none; }
+      header { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+      .badge { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Listing Onboarding API — Unit Test Report</h1>
+      <p>Validation, route, controller, service, authentication, and negative-request verification</p>
+    </header>
+
+    <section class="content">
+      <div class="toolbar">
+        <button type="button" onclick="window.print()">Print / Save as PDF</button>
+      </div>
+
+      <div class="summary">
+        <div class="card"><strong>96</strong><span>Tests passed</span></div>
+        <div class="card"><strong>3</strong><span>Test files passed</span></div>
+        <div class="card"><strong>PASS</strong><span>TypeScript check</span></div>
+        <div class="card"><strong>PASS</strong><span>Production build</span></div>
+      </div>
+
+      <p class="note">
+        Execution date: <strong>15 September 2026</strong>. All automated tests completed
+        successfully with no failed or skipped test files.
+      </p>
+
+      <h2>Execution environment</h2>
+      <table>
+        <tbody>
+          <tr><th>Project</th><td>Listing Onboarding API</td></tr>
+          <tr><th>Operating system</th><td>Windows x64</td></tr>
+          <tr><th>Node.js</th><td>v24.19.0</td></tr>
+          <tr><th>npm</th><td>11.17.0</td></tr>
+          <tr><th>Test framework</th><td>Vitest 4.1.10</td></tr>
+          <tr><th>API test client</th><td>Supertest</td></tr>
+          <tr><th>Base endpoint</th><td><code>/v1/listing/onboarding</code></td></tr>
+        </tbody>
+      </table>
+
+      <h2>Commands executed</h2>
+      <pre><code>npm.cmd test
+.\node_modules\.bin\tsc.cmd --noEmit
+npm.cmd run build</code></pre>
+
+      <h2>Test-suite summary</h2>
+      <table>
+        <thead>
+          <tr><th>Test file</th><th>Scope</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>src/test/listing.validation.test.ts</code></td>
+            <td>Field validation, boundary cases, input safety, dates, times, listing-type rules, commercial rules, floors, and submission requirements</td>
+            <td><span class="badge pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><code>src/test/listing.test.ts</code></td>
+            <td>POST, GET, PATCH, authentication, errors, malformed JSON, unsupported methods, and invalid IDs</td>
+            <td><span class="badge pass">PASS</span></td>
+          </tr>
+          <tr>
+            <td><code>src/test/listing.service.test.ts</code></td>
+            <td>Database-aware partial-update validation for effective listing-type and unit-type combinations</td>
+            <td><span class="badge pass">PASS</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Validation verification matrix</h2>
+      <table>
+        <thead>
+          <tr><th>#</th><th>Scenario</th><th>Expected behavior</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>Discount price exceeds property price</td><td>Rejected with HTTP 400 validation error</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>2</td><td>Discount price is below 80% of property price</td><td>Rejected; 80% and 100% boundaries accepted</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>3</td><td>Key-feature count</td><td>Submission requires 5–10 items</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>4</td><td>Ceiling-height inches outside 0–11</td><td>Negative, 12+, and decimal values rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>5</td><td>Ceiling height outside 5–25</td><td>Out-of-range values rejected; boundaries accepted</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>6</td><td>Negative or decimal parking count</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>7</td><td>PIN code is not exactly six numeric digits</td><td>5-digit, 7-digit, negative, and decimal values rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>8</td><td>Listing name exceeds 240 characters</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>9</td><td>Listing name is empty or whitespace-only</td><td>Rejected after trimming</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>10</td><td>Listing name contains leading/trailing spaces</td><td>Trimmed value returned by validation</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>11</td><td>HTML tags in listing name</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>12</td><td>Script-like listing-name input</td><td><code>alert</code>, <code>javascript:</code>, and event-handler patterns rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>13</td><td>Invalid ISO availability date</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>14</td><td>Numeric epoch supplied as available-from date</td><td>Rejected because an ISO string is required</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>15</td><td>Past availability date for under-construction listing</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>16</td><td>Invalid 24-hour time such as 25:00</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>17</td><td>End time before start time</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>18</td><td>Start time equals end time</td><td>Rejected as a zero-length window</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>19</td><td>Combined-unit self-reference</td><td>Primary unit cannot appear in combined units</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>20</td><td>Furnishing amenities supplied for land</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>21</td><td>Apartment amenities supplied outside home</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>22</td><td>Security amount supplied for secondary sale</td><td>Rejected as a rent-only field</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>23</td><td>Stamp duty supplied for rent/lease</td><td>Rejected as a sale-only field</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>24</td><td>Monthly rent supplied for secondary sale</td><td>Rejected as a rent-only field</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>25</td><td>Negative property price</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>26</td><td>Maintenance included with non-zero charges</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>27</td><td>Ceiling height or total floors supplied for land</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>28</td><td>Industrial-only fields supplied for home</td><td>Power, truck-access, and lorry-bay fields rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>29</td><td>Particular visit selected without a particular day</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>30</td><td>RERA area type supplied for land</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>31</td><td>Floor number below -1</td><td>Rejected; -1 basement and 0 ground accepted</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>32</td><td>Floor number exceeds total floors</td><td>Rejected</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>33</td><td>Unsupported listing type</td><td>Rejected by enum validation</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>34</td><td>Protected status or ownership fields in payload</td><td>Rejected before service execution</td><td><span class="badge pass">PASS</span></td></tr>
+        </tbody>
+      </table>
+
+      <h2>Negative request and route verification</h2>
+      <table>
+        <thead>
+          <tr><th>Scenario</th><th>Expected result</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Missing <code>listing_type</code></td><td>HTTP 400</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Missing <code>current_step</code></td><td>HTTP 400</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Missing <code>onboarding_type</code></td><td>HTTP 400</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Only required metadata; no meaningful listing data</td><td>HTTP 400</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Empty object or empty request body</td><td>HTTP 400</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Malformed JSON</td><td>HTTP 400 with controlled JSON error response</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Invalid or expired authentication token</td><td>HTTP 401</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Invalid MongoDB ObjectId</td><td>HTTP 400</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Encoded path traversal supplied as ID</td><td>HTTP 400/404; service not called</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>GET on base endpoint without ID</td><td>HTTP 405; no list-all response</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>PUT on base endpoint</td><td>HTTP 405 with <code>Allow: POST</code></td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>DELETE on base endpoint</td><td>HTTP 405 with <code>Allow: POST</code></td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Update listing type while retaining incompatible existing unit type</td><td>Rejected before database update</td><td><span class="badge pass">PASS</span></td></tr>
+          <tr><td>Update listing type together with a compatible unit type</td><td>Accepted</td><td><span class="badge pass">PASS</span></td></tr>
+        </tbody>
+      </table>
+
+      <h2>Test limitations</h2>
+      <p>
+        Endpoint tests use Supertest with the listing service mocked. Service-level update tests mock
+        the Mongoose model. These tests verify application logic without requiring a live database;
+        a separate integration test against a controlled MongoDB test database is recommended before
+        production deployment.
+      </p>
+
+      <h2>Final result</h2>
+      <p>
+        <span class="badge pass">PASS</span>
+        All implemented and documented scenarios included in this automated test scope passed.
+      </p>
+
+      <footer>
+        Generated from the local Listing Onboarding API test run on 15 September 2026.
+      </footer>
+    </section>
+  </main>
+</body>
+</html>

@@ -145,6 +145,34 @@ describe("Listing endpoints", () => {
             expect(response.body.message).toContain("cannot be provided");
             expect(service.saveListing).not.toHaveBeenCalled();
         });
+
+        it.each(["put", "delete", "get"] as const)(
+            "returns 405 for %s on the base endpoint",
+            async (method) => {
+                const response = await request(app)[method]("/v1/listing/onboarding")
+                    .set(auth);
+
+                expect(response.status).toBe(405);
+                expect(response.headers.allow).toBe("POST");
+                expect(response.body.success).toBe(false);
+                expect(service.saveListing).not.toHaveBeenCalled();
+            }
+        );
+
+        it("returns 400 for malformed JSON", async () => {
+            const response = await request(app)
+                .post("/v1/listing/onboarding")
+                .set(auth)
+                .set("Content-Type", "application/json")
+                .send('{"listing_type":"home",}');
+
+            expect(response.status).toBe(400);
+            expect(response.body).toEqual({
+                success: false,
+                message: "Request body must contain valid JSON"
+            });
+            expect(service.saveListing).not.toHaveBeenCalled();
+        });
     });
 
     describe("GET /v1/listing/onboarding/:id", () => {
@@ -185,6 +213,15 @@ describe("Listing endpoints", () => {
 
             expect(response.status).toBe(400);
             expect(response.body.success).toBe(false);
+            expect(service.getListingById).not.toHaveBeenCalled();
+        });
+
+        it("does not accept an encoded path-traversal value as an id", async () => {
+            const response = await request(app)
+                .get("/v1/listing/onboarding/%2E%2E%2F%2E%2E%2Fusers")
+                .set(auth);
+
+            expect([400, 404]).toContain(response.status);
             expect(service.getListingById).not.toHaveBeenCalled();
         });
 
