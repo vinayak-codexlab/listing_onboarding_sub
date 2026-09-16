@@ -266,3 +266,4 @@ listingOnboardingSchema.index({ "broker_and_agent.sub": 1, "broker_and_agent.fir
 listingOnboardingSchema.index({ listing_id: 1, current_step: 1 });
 
 export default model("Listings", listingOnboardingSchema);
+//exporting the schema here 
