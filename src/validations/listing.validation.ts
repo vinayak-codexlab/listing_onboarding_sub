@@ -5,6 +5,7 @@ import { ApiError } from "../utils/apiError.js";
 // Reusable Validators
 export const objectIdSchema = z.string().trim().regex(/^[a-f\d]{24}$/i, "Invalid ObjectId");
 const optionalString = z.string().trim().optional();
+const optionalStringOrNumber = z.union([z.string(), z.number()]).transform((value) => String(value).trim()).optional();
 const optionalNullableString = z.string().trim().optional().nullable();
 const optionalNumber = z.coerce.number().optional();
 const nonNegativeNumber = z.coerce.number().min(0).optional();
@@ -34,7 +35,7 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.project_name": optionalString,
   "listing_details.tower": optionalString,
   "listing_details.unit_no": optionalString,
-  "listing_details.floor_no": optionalString,
+  "listing_details.floor_no": optionalStringOrNumber,
   "listing_details.combine_unit_no": z.array(z.string()).optional(),
   "listing_details.UnitFloorPosition": z.nativeEnum(Constants.UnitFloorPosition).optional(),
   "listing_details.towerHide": optionalBoolean,
@@ -66,13 +67,13 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
   "listing_details.no_of_bathrooms": optionalString,
   "listing_details.no_of_lifts": optionalString,
   "listing_details.no_of_passengers_lifts": optionalString,
-  "listing_details.no_of_parkings": optionalString,
+  "listing_details.no_of_parkings": optionalStringOrNumber,
   "listing_details.no_of_private_parkings": optionalString,
   "listing_details.cross_ventilation": z.nativeEnum(Constants.CrossVentilation).optional(),
   "listing_details.natural_light": z.nativeEnum(Constants.NaturalLight).optional(),
   "listing_details.furnishing": optionalString,
   "listing_details.furnishing_type": optionalString,
-  "listing_details.ceiling_height": optionalString,
+  "listing_details.ceiling_height": optionalStringOrNumber,
   "listing_details.ceiling_height_side": optionalString,
   "listing_details.vastu_compliant": z.nativeEnum(Constants.VastuCompliant).optional(),
   "listing_details.pets_allowed": z.nativeEnum(Constants.PetsAllowed).optional(),
@@ -228,6 +229,8 @@ const listingFieldSchemas: Record<string, z.ZodTypeAny> = {
 };
 
 export const validateListingData = (data: Record<string, any>) => {
+  const parsedData: Record<string, any> = {};
+
   for (const [key, value] of Object.entries(data)) {
     // Server-controlled protected fields
     if (
@@ -255,10 +258,12 @@ export const validateListingData = (data: Record<string, any>) => {
         result.error.issues[0]?.message ?? `Invalid value for ${key}`
       );
     }
+
+    parsedData[key] = result.data;
   }
 
-  const propertyPrice = data["commercial_details.property_price"];
-  const discountPrice = data["commercial_details.discount_price"];
+  const propertyPrice = parsedData["commercial_details.property_price"];
+  const discountPrice = parsedData["commercial_details.discount_price"];
   if (
     propertyPrice !== undefined &&
     discountPrice !== undefined &&
@@ -271,8 +276,8 @@ export const validateListingData = (data: Record<string, any>) => {
   }
 
   // Validate listing_type + unit_type combination
-  const listingType = data.listing_type;
-  const unitType = data["listing_details.unit_type"];
+  const listingType = parsedData.listing_type;
+  const unitType = parsedData["listing_details.unit_type"];
 
   if (listingType && unitType) {
     const allowedUnitTypes = 
@@ -285,7 +290,7 @@ export const validateListingData = (data: Record<string, any>) => {
     }
   }
 
-  return data;
+  return parsedData;
 };
 
 // Status Action Validator
